@@ -1,33 +1,26 @@
 const initDB = require('../config/db');
 
-// OBTENER PRODUCTOS (Incluye los datos del cliente asignado si existe)
+// OBTENER PRODUCTOS
 const getProductos = async (req, res) => {
   try {
     const db = await initDB();
-    const productos = await db.all(`
-      SELECT p.*, c.nombres AS cliente_nombre, c.apellidos AS cliente_apellido 
-      FROM productos p 
-      LEFT JOIN clientes c ON p.cliente_id = c.id
-    `);
+    const productos = await db.all('SELECT * FROM productos');
     res.json(productos);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al obtener productos', error: error.message });
   }
 };
 
-// CREAR PRODUCTO (Con los campos nuevos y la relación con el cliente)
+// CREAR PRODUCTO
 const createProducto = async (req, res) => {
   try {
     const db = await initDB();
-    const { nombre, precio, cantidad, imagen, descripcion, cliente_id } = req.body;
-    
+    const { nombre, precio } = req.body;
     const result = await db.run(
-      `INSERT INTO productos (nombre, precio, cantidad, imagen, descripcion, cliente_id) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, precio, cantidad || 0, imagen || null, descripcion || '', cliente_id || null]
+      'INSERT INTO productos (nombre, precio) VALUES (?, ?)',
+      [nombre, precio]
     );
-    
-    res.json({ id: result.lastID, nombre, precio, cantidad, imagen, descripcion, cliente_id });
+    res.json({ id: result.lastID, nombre, precio });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al crear producto', error: error.message });
   }
@@ -38,15 +31,11 @@ const updateProducto = async (req, res) => {
   try {
     const db = await initDB();
     const { id } = req.params;
-    const { nombre, precio, cantidad, imagen, descripcion, cliente_id } = req.body;
-    
+    const { nombre, precio } = req.body;
     await db.run(
-      `UPDATE productos 
-       SET nombre = ?, precio = ?, cantidad = ?, imagen = ?, descripcion = ?, cliente_id = ? 
-       WHERE id = ?`,
-      [nombre, precio, cantidad, imagen, descripcion, cliente_id, id]
+      'UPDATE productos SET nombre = ?, precio = ? WHERE id = ?',
+      [nombre, precio, id]
     );
-    
     res.json({ mensaje: 'Producto actualizado con éxito' });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al actualizar producto', error: error.message });
