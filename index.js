@@ -1,6 +1,16 @@
+// 1. Importar los módulos requeridos
+const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+require('dotenv').config();
 
-// CORS dinámico: autoriza cualquier puerto de localhost en desarrollo
+// 2. INICIALIZAR LA APLICACIÓN (Esto falta o está más abajo en tu archivo)
+const app = express();
+
+// 3. Aplicar middlewares (Helmet, CORS, Express JSON)
+app.use(helmet());
+
+// Configuración dinámica de CORS para localhost
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -17,3 +27,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use(express.json());
+
+// 4. Tus rutas (rutas de productos, clientes, etc.)
+// app.use('/api/productos', rutasProductos);
+
+// 5. Iniciar el servidor
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
