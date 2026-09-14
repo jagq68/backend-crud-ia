@@ -4,13 +4,16 @@ const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
 
-// 2. INICIALIZAR LA APLICACIÓN (Esto falta o está más abajo en tu archivo)
+// 2. Importar las rutas con los nombres exactos de tus archivos
+const rutasProductos = require('./routes/productoRoutes'); 
+const rutasClientes = require('./routes/clienteRoutes');
+
+// 3. Inicializar la aplicación
 const app = express();
 
-// 3. Aplicar middlewares (Helmet, CORS, Express JSON)
+// 4. Middlewares de Seguridad y Lectura de JSON
 app.use(helmet());
 
-// Configuración dinámica de CORS para localhost
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
@@ -30,11 +33,17 @@ app.use(cors({
 
 app.use(express.json());
 
-// 4. Tus rutas (rutas de productos, clientes, etc.)
-// app.use('/api/productos', rutasProductos);
+// 5. Configuración de Endpoints
+app.use('/api/productos', rutasProductos);
+app.use('/api/clientes', rutasClientes);
 
-// 5. Iniciar el servidor
+// Ruta de prueba
+app.get('/api', (req, res) => {
+  res.json({ status: 'OK', mensaje: 'API Backend activa' });
+});
+
+// 6. Iniciar el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor ejecutándose correctamente en http://localhost:${PORT}`);
 });
